@@ -1,0 +1,11 @@
+todo:
+1.finish the design (windows):
+    started 10-05-25
+    finish ...
+2.get input_handler to work (link to windows)
+3.test adding printing tasks
+4.add searching (new panel)
+5.add 1 time undo fonction
+6.add sorting (new panel)
+7.add json support (save/load)
+8.(not sure)(encryption key)
