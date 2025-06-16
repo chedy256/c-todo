@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include "../include/panels.h"
+#include "../include/input_handler.h"
 
 int main() {
     initscr();
@@ -15,6 +16,7 @@ int main() {
     mvprintw(4, 3, "* use R/L arrows to navigate between tabs in the tab panel");
     mvprintw(5, 3, "* use UP/DOWN arrow to navigate inside the chosen tab");
     mvprintw(7, 2, "Press h for help");
+    mvprintw(8,getmaxx(stdscr)-16,"command : ");
     refresh();
 
     short int yMax, xMax;
@@ -22,14 +24,17 @@ int main() {
     static short int yoffset = 9, xoffset = 4;
     WINDOW *win = newwin(yMax - yoffset - xoffset/2, xMax - (xoffset * 2), yoffset, xoffset);
     box(win, 0, 0);
-    wrefresh(win);
-
+    taskswindow(win);
     head = initPanel();
     current = head;
     panel(win);
-    taskswindow(win);
+    move(8,getmaxx(stdscr)-6);
     wrefresh(win);
-    getch();
+    int ch;
+    do{
+        move(8,getmaxx(stdscr)-6);
+        ch=getch();
+    }while(handle_input(ch, win));
     freePanel();
     endwin();
     return 0;

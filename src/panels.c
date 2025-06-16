@@ -6,12 +6,12 @@
 
 
 PanelElement *head = NULL, *current = NULL;
-PanelElement *view_panel, *trash_panel;//i will add save and load
+PanelElement *view_panel, *search_panel;//i will add : sort save and load
 
-PanelElement* createPanelElement(char* name) {
+PanelElement* createPanelElement(char* input) {
     PanelElement* newElem = (PanelElement*)malloc(sizeof(PanelElement));
     if (newElem) {
-        newElem->name = strdup(name);
+        newElem->name = input;
         newElem->next = NULL;
         newElem->prev = NULL;
     }
@@ -20,47 +20,39 @@ PanelElement* createPanelElement(char* name) {
 
 PanelElement* initPanel() {
     view_panel = createPanelElement("View");
-    trash_panel = createPanelElement("Trash");
+    search_panel = createPanelElement("Search");
     //i will add import from json file when i add support
 
-    view_panel->next=trash_panel;
-    trash_panel->prev=view_panel;
-    trash_panel->next = NULL;
+    view_panel->next=search_panel;
+    search_panel->prev=view_panel;
+    search_panel->next = NULL;
     return view_panel;
 }
-void display_title_only(int title_width){
-    mvprintw(10,title_width/2-3, "Title");
-}
-void display_title_and_note(int available_width){
-    mvprintw(10,available_width/2-5, "Title");
-    mvprintw(10,available_width-3, "N");
-}
-void display_all_columns(int available_width){
-    mvprintw(10,available_width-24-available_width/2, "Title");
-    mvprintw(10,available_width-23, "N");
-    mvprintw(10,available_width-14, "Created on");
-}
-void taskswindow(WINDOW *parent_win){
-    int COLS = getmaxx(parent_win);
-    int available_width = COLS - 20; // Reserve ~15 for Note + Date + spacing
-    int title_width = (available_width < 64) ? available_width : 64;
 
+void taskswindow(WINDOW *parent_win){//will add what todolist to write
+    int COLS = getmaxx(parent_win);
     if (COLS < 40) {
         // Very narrow: show only title
-        display_title_only(title_width);
+        mvwprintw(parent_win,1,(COLS-3)/2, "Title");
     } else if (COLS < 60) {
         // Medium: title + note indicator
-        display_title_and_note(available_width);
+        mvwprintw(parent_win,1,(COLS-4)/2, "Title");
+        mvwvline(parent_win,1,COLS-3,0,getmaxy(parent_win)-2);
+        mvwprintw(parent_win,1,COLS-2, "N");
     } else {
         // Full width: all three columns
-        display_all_columns(available_width);
-    }
+        mvwprintw(parent_win,1,(COLS-20)/2, "Title");
+        mvwvline(parent_win,1,COLS-19,0,getmaxy(parent_win)-2);
+        mvwprintw(parent_win,1,COLS-18, "N");
+        mvwvline(parent_win,1,COLS-17,0,getmaxy(parent_win)-2);
+        mvwprintw(parent_win,1,COLS-13, "Created on");
+    }// 13.04.2001 16:10
+    wrefresh(parent_win);
 }
 void freePanel() {
     current=head;
     while (current != NULL) {
         PanelElement* next = current->next;
-        free(current->name);
         free(current);
         current = next;
     }
@@ -69,12 +61,12 @@ void freePanel() {
 }
 void panel(WINDOW *w){
     int cmd;
-    /*do{
+    taskswindow(w);
+    do{
         PanelElement* temp = head;
         int x_pos=1;
         wmove(w, 0, 1);
         wattron(w, A_BOLD);
-
 
         while (temp != NULL) {
             if (temp == current) {
@@ -97,7 +89,6 @@ void panel(WINDOW *w){
         else if(cmd== KEY_LEFT)
             current=(current->prev)?current->prev:current;
     }while(cmd!= KEY_DOWN);
-    */
     wattroff(w, A_REVERSE);
     mvwprintw(w,0,1, " View ");
     wattron(w, A_REVERSE);
