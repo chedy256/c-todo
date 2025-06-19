@@ -14,7 +14,6 @@ extern PanelElement *head, *current;
 
 PanelElement* createPanelElement(char* name);
 PanelElement* initPanel();
-void taskswindow(WINDOW *);
 void freePanel();
 void panel(WINDOW *);
 

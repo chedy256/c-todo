@@ -6,75 +6,103 @@
 
 void setPriorityWindow(WINDOW *parent_win,char *action){
     int height = getmaxx(parent_win)>30?7:10;
-    int width =getmaxx(parent_win)>30?30:getmaxx(parent_win)-8;
+    int width = getmaxx(parent_win)-8;
     WINDOW *w = newwin(height, width, 10, 8);
     box(w, 0, 0);
     wattron(w,A_BOLD);
     mvwprintw(w,1,width/2-9,"%s THE PRIORITY",action);
     wattroff(w,A_BOLD);
     mvwhline(w,2,1 , 0, getmaxx(w)-2);
+    attr_t cc=COLOR_PAIR(2);
     int nav;
     //9 for spacing(2 per element before+ 1 after the last ) +2 border
     if(height ==10){
         int pos=4;
+        wattron(w,COLOR_PAIR(2));
+        mvwprintw(w, 4, 3, "HIGH");
+        wattroff(w,COLOR_PAIR(2));
+        mvwprintw(w,5,3,"DEFAULT");
+        wattron(w,COLOR_PAIR(3));
+        mvwprintw(w,6,3,"LOW");
+        wattroff(w,COLOR_PAIR(3));
         do{//if space is tiny
             mvwprintw(w,pos,2,">");
-            mvwprintw(w, 4, 3, "All");
-            mvwprintw(w,5,3,"Title");
-            mvwprintw(w,6,3,"Priority");
-            mvwprintw(w,7,3,"Note");
-            nav= wgetch(w);
+            wrefresh(w);
+            move(8,getmaxx(stdscr));
+            refresh();
+            nav= getch();
             if(nav==KEY_UP && pos>4)
                 pos--;
-            else if(nav==KEY_DOWN && pos>7)
+            else if(nav==KEY_DOWN && pos<6)
                 pos++;
         }while(nav != KEY_ENTER && nav!= '\n');
-        switch(pos){
+        /*switch(pos){
             case 4:
-            titleWindow(w, "EDIT");
-            noteWindow(w, "EDIT");
-            setPriorityWindow(w,"EDIT");
-            break;
-            case 5:
-            titleWindow(w,"EDIT");
-            break;
+                task->priority=HIGH;
             case 6:
-            setPriorityWindow(w,"EDIT");
-            break;
-            case 7:
-            noteWindow(w, "EDIT");
-        }
+                task->priority=LOW;
+            default:
+                task->priority=DEFAULT;
+                break;
+        }*/
     }else{//if space is wide enough
-        const int offset=(width-15)/3;
-        const int op1=offset-1,op2=2*offset+2,op3=3*offset+7,op4=4*offset+16;
+        const int offset=(width-16)/4;
+        const int op1=offset-1,
+                  op2=2*offset+4,
+                  op3=3*offset+7;
         int pos=op1;
+        wattron(w,COLOR_PAIR(2));
+        mvwprintw(w,4,offset,"HIGH");
+        wattroff(w,COLOR_PAIR(2));
+        mvwprintw(w,4,op2+1,"DEFAULT");
+        wattron(w,COLOR_PAIR(3));
+        mvwprintw(w,4,op3+1,"LOW");
+        wattroff(w,COLOR_PAIR(3));
+        wrefresh(w);
         do{
+            wattron(w,cc);
             mvwprintw(w,4,pos,">");
-            mvwprintw(w,4,offset,"HIGH");
-            mvwprintw(w,4,op2+1,"DEFAULT");
-            mvwprintw(w,4,op3+1,"LOW");
+            wattroff(w,cc);
+            wrefresh(w);
+            move(8,getmaxx(stdscr));
+            refresh();
             nav= wgetch(w);
             if(nav==KEY_LEFT){
-                if(pos==op2)
+                mvwprintw(w,4,pos," ");  // Clear at current position
+                if(pos!=op1)
+                    mvwprintw(w,pos,2," ");
+                if(pos==op2){
                     pos=op1;
-                else if (pos==op3)
+                    cc=COLOR_PAIR(1);
+                }
+                else if (pos==op3){
                     pos=op2;
-                else if(pos==op4)
-                    pos=op3;
+                    cc=COLOR_PAIR(3);
+                }
             }else if(nav==KEY_RIGHT){
-                if(pos==op1)
+                mvwprintw(w,4,pos," ");  // Clear at current position
+                if(pos!=op3)
+                    mvwprintw(w,pos,2," ");
+                if(pos==op1){
                     pos=op2;
-                else if (pos==op2)
+                    cc=COLOR_PAIR(3);
+                }
+                else if (pos==op2){
                     pos=op3;
-                else if(pos==op3)
-                    pos=op4;
-            }
+                    cc=COLOR_PAIR(4);
+                }
+            }wrefresh(w);
         }while(nav != KEY_ENTER && nav!= '\n');
     }
+    wclear(w);
+    wrefresh(w);
+    delwin(w);
+    touchwin(parent_win);
+    wrefresh(parent_win);
 }
 void editWindow(WINDOW *parent_win){
     int height = getmaxx(parent_win)>36?7:10;
-    int width =getmaxx(parent_win)>38?getmaxx(parent_win)-8:30;
+    int width = getmaxx(parent_win)-8;
     WINDOW *w = newwin(height, width, 10, 8);
     box(w, 0, 0);
     wattron(w,A_BOLD);
@@ -84,53 +112,57 @@ void editWindow(WINDOW *parent_win){
     int nav;
     //9 for spacing(2 per element before+ 1 after the last ) +2 border
     if(height ==10){
+        mvwprintw(w, 4, 3, "All");
+        mvwprintw(w,5,3,"Title");
+        mvwprintw(w,6,3,"Priority");
+        mvwprintw(w,7,3,"Note");
         int pos=4;
         do{//if space is tiny
-            mvwvline(w,4,2,' ',5 );
             mvwprintw(w,pos,2,">");
-            mvwprintw(w, 4, 3, "All");
-            mvwprintw(w,5,3,"Title");
-            mvwprintw(w,6,3,"Priority");
-            mvwprintw(w,7,3,"Note");
             wrefresh(w);
-            noecho();
             nav= wgetch(w);
-            if(nav==KEY_UP && pos>4)
+            if(nav==KEY_UP && pos>4){
+                mvwprintw(w,pos,2," ");
                 pos--;
-            else if(nav==KEY_DOWN && pos>7)
+            }else if(nav==KEY_DOWN && pos<7){
+                mvwprintw(w,pos,2," ");
                 pos++;
-            echo();
+            }
+            move(8,getmaxx(stdscr));
+            refresh();
         }while(nav != KEY_ENTER && nav!= '\n');
         switch(pos){
             case 4:
-            titleWindow(w, "EDIT");
-            noteWindow(w, "EDIT");
-            setPriorityWindow(w,"EDIT");
+            titleWindow(parent_win, "EDIT");
+            noteWindow(parent_win, "EDIT");
+            setPriorityWindow(parent_win,"EDIT");
             break;
             case 5:
-            titleWindow(w,"EDIT");
+            titleWindow(parent_win,"EDIT");
             break;
             case 6:
-            setPriorityWindow(w,"EDIT");
+            setPriorityWindow(parent_win,"EDIT");
             break;
             case 7:
-            noteWindow(w, "EDIT");
+            noteWindow(parent_win, "EDIT");
         }
     }else{//if space is wide enough
         const int offset=(width-21)/5;
         const int op1=offset-1,op2=2*offset+2,op3=3*offset+7,op4=4*offset+16;
         int pos=op1;
+        mvwprintw(w,4,offset,"All");
+        mvwprintw(w,4,op2+1,"Title");
+        mvwprintw(w,4,op3+1,"Priority");
+        mvwprintw(w,4,op4+1,"Note");
         do{
-            mvwhline(w,4,1,' ',op4 );
             mvwprintw(w,4,pos,">");
-            mvwprintw(w,4,offset,"All");
-            mvwprintw(w,4,op2+1,"Title");
-            mvwprintw(w,4,op3+1,"Priority");
-            mvwprintw(w,4,op4+1,"Note");
-            noecho();
             wrefresh(w);
+            move(8,getmaxx(stdscr));
+            refresh();
             nav= wgetch(w);
             if(nav==KEY_LEFT){
+                if(pos!=op1)
+                    mvwprintw(w,4,pos," ");
                 if(pos==op2)
                     pos=op1;
                 else if (pos==op3)
@@ -138,6 +170,8 @@ void editWindow(WINDOW *parent_win){
                 else if(pos==op4)
                     pos=op3;
             }else if(nav==KEY_RIGHT){
+                if(pos!=op4)
+                    mvwprintw(w,4,pos," ");
                 if(pos==op1)
                     pos=op2;
                 else if (pos==op2)
@@ -145,15 +179,23 @@ void editWindow(WINDOW *parent_win){
                 else if(pos==op3)
                     pos=op4;
             }
-            echo();
-        }while(nav != KEY_ENTER && nav!= '\n');
+        }while(nav != KEY_ENTER && nav!= '\n' && nav!=27 && nav!='q');
     }
+    touchwin(parent_win);
+    wrefresh(parent_win);
+    wclear(w);
+    wrefresh(w);
+    delwin(w);
+    touchwin(parent_win);
+    wrefresh(parent_win);
+    //save the changes to the task
+    return;
 }
 void noteWindow(WINDOW* parent_win, char* action){
-    WINDOW *w = newwin(getmaxy(parent_win)-20, getmaxx(parent_win)-8, 10, 8);
+    int width = getmaxx(parent_win)-4;
+    int height = 512/width +8;
+    WINDOW *w = newwin(height, width, 10, 6);
     box(w, 0, 0);
-    int height = getmaxy(w);
-    int width = getmaxx(w);
 
     wattron(w,A_BOLD);
     mvwprintw(w,1,width/2-5,"%s A NOTE",action);
@@ -171,33 +213,34 @@ void noteWindow(WINDOW* parent_win, char* action){
 
     // if it's an edit Title it should return as it is manipulated by the editWindow logic based on the user input
     if(strcmp(action,editAction)==0) return;
-    move(8,getmaxy(stdscr)-16);
-    int ch = getch();
+    move(8,getmaxx(stdscr)-6);
     refresh();
+    int ch = getch();
+    touchwin(parent_win);
+    wrefresh(parent_win);
     wclear(w);
     wrefresh(w);
     delwin(w);
+    touchwin(parent_win);
+    wrefresh(parent_win);
     switch(ch){
         case 'q':
         case 27:
-            touchwin(parent_win);
-            wrefresh(parent_win);
+            /*if strlen(task_input)<2 after removing any space from begining and finish skip
+             * else save
+             */
             return;
         case KEY_ENTER:
         case '\n':
-            move(8,getmaxx(stdscr)-6);
-        /*overwrite the task to the todo list
-         * store a copy to restore if the user want to and that will be for all the data inputed
-         **(keep track of  the task id ,what changed: title note status priority, and the last value)*/
-            return;//setPriorityWindow(w, action);
+            setPriorityWindow(parent_win,addAction);
     }
 }
 
 void titleWindow(WINDOW *parent_win,char *action) {
-    WINDOW *w = newwin(10, getmaxx(parent_win)-4, 11, 6);
+    int width = getmaxx(parent_win)-4;
+    int height = 156/width +8;
+    WINDOW *w = newwin(height, width, 10, 6);
     box(w, 0, 0);
-    int height = getmaxy(w);// will be calculated 156 /width +5;
-    int width = getmaxx(w);
 
     wattron(w,A_BOLD);
     mvwprintw(w,1,width/2-4,"%s TASK",action);
@@ -219,28 +262,27 @@ void titleWindow(WINDOW *parent_win,char *action) {
      **(keep track of  the task id ,what changed: title note status priority, and the last value)*/
     // if it's an edit Title it should return as it is manipulated by the editWindow logic based on the user input
     if(strcmp(action,editAction)==0) return;
-    move(8,getmaxy(stdscr)-16);
+    move(8,getmaxx(stdscr)-6);
     refresh();
     int ch = getch();
     touchwin(parent_win);
     wrefresh(parent_win);
-    switch(ch){
-        case 'q':
-        case 27:
-            /*if strlen(task_input)<2 after removing any space from begining and finish
-             *  skip
-             * else: save
-             */
-            return;
-        case KEY_ENTER:
-        case '\n':
-            noteWindow(w,addAction);
-    }
     wclear(w);
     wrefresh(w);
     delwin(w);
     touchwin(parent_win);
     wrefresh(parent_win);
+    switch(ch){
+        case 'q':
+        case 27:
+            /*if strlen(task_input)<2 after removing any space from begining and finish skip
+             * else save
+             */
+            return;
+        case KEY_ENTER:
+        case '\n':
+            noteWindow(parent_win,addAction);
+    }
 }
 // made it dynamic if width less then 72 it will be in one page
 void helpWindow(WINDOW *parent_win) {
@@ -284,4 +326,48 @@ void helpWindow(WINDOW *parent_win) {
     delwin(help);
     touchwin(parent_win);
     wrefresh(parent_win);
+}
+void taskswindow(WINDOW *parent_win){//will add what todolist to write
+    int COLS = getmaxx(parent_win);
+    if (COLS < 40) {
+        // Very narrow: show only title
+        mvwprintw(parent_win,1,(COLS-3)/2, "Title");
+    } else if (COLS < 60) {
+        // Medium: title + note indicator
+        mvwprintw(parent_win,1,(COLS-4)/2, "Title");
+        mvwvline(parent_win,1,COLS-3,0,getmaxy(parent_win)-2);
+        mvwprintw(parent_win,1,COLS-2, "N");
+    } else {
+        // Full width: all three columns
+        wattron(parent_win,A_BOLD);
+        mvwprintw(parent_win,1,(COLS-21)/2, "Title");
+        mvwvline(parent_win,1,COLS-20,0,getmaxy(parent_win)-2);
+        mvwprintw(parent_win,1,COLS-19, "N");
+        mvwvline(parent_win,1,COLS-18,0,getmaxy(parent_win)-2);
+        mvwprintw(parent_win,1,COLS-14, "Created on");
+        wattroff(parent_win,A_BOLD);
+        /*generic*/
+        wattron(parent_win,COLOR_PAIR(2)|A_UNDERLINE);
+         wattron(parent_win,A_REVERSE);
+        mvwprintw(parent_win,3,2, "[L] 1. First Task");
+        mvwprintw(parent_win,3,COLS-19, "V");
+        mvwprintw(parent_win,3,COLS-17, "13.04.2001 10:56");
+        wattroff(parent_win,COLOR_PAIR(2)|A_UNDERLINE);
+        mvwprintw(parent_win,4,2, "[D] 1.1 First subTask");
+        mvwprintw(parent_win,4,COLS-19, "X");
+        mvwprintw(parent_win,4,COLS-17, "13.04.2001 10:58");
+        wattron(parent_win,COLOR_PAIR(3));
+        mvwprintw(parent_win,5,2, "[H] 1.1.1 First subSubTask");
+        mvwprintw(parent_win,5,COLS-19, "V");
+        mvwprintw(parent_win,5,COLS-17, "13.04.2001 10:58");
+
+        mvwprintw(parent_win,6,2, "[L] 1.1.2 Second subSubTask");
+        mvwprintw(parent_win,6,COLS-19, "V");
+        mvwprintw(parent_win,6,COLS-17, "13.04.2001 10:58");
+        wattroff(parent_win,A_REVERSE);
+        wattroff(parent_win,COLOR_PAIR(3));
+    }// "13.04.2001 10:56" :16 char +2 spacing
+    mvwhline(parent_win,2,1,0,getmaxx(parent_win)-2);
+    wrefresh(parent_win);
+    refresh();
 }

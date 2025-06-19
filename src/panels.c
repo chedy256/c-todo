@@ -1,8 +1,9 @@
 
 #include <ncurses.h>
-#include <string.h>
+//#include <string.h>
 #include <stdlib.h>
 #include "../include/panels.h"
+//#include "../include/windows.h"
 
 
 PanelElement *head = NULL, *current = NULL;
@@ -29,26 +30,6 @@ PanelElement* initPanel() {
     return view_panel;
 }
 
-void taskswindow(WINDOW *parent_win){//will add what todolist to write
-    int COLS = getmaxx(parent_win);
-    if (COLS < 40) {
-        // Very narrow: show only title
-        mvwprintw(parent_win,1,(COLS-3)/2, "Title");
-    } else if (COLS < 60) {
-        // Medium: title + note indicator
-        mvwprintw(parent_win,1,(COLS-4)/2, "Title");
-        mvwvline(parent_win,1,COLS-3,0,getmaxy(parent_win)-2);
-        mvwprintw(parent_win,1,COLS-2, "N");
-    } else {
-        // Full width: all three columns
-        mvwprintw(parent_win,1,(COLS-20)/2, "Title");
-        mvwvline(parent_win,1,COLS-19,0,getmaxy(parent_win)-2);
-        mvwprintw(parent_win,1,COLS-18, "N");
-        mvwvline(parent_win,1,COLS-17,0,getmaxy(parent_win)-2);
-        mvwprintw(parent_win,1,COLS-13, "Created on");
-    }// 13.04.2001 16:10
-    wrefresh(parent_win);
-}
 void freePanel() {
     current=head;
     while (current != NULL) {
@@ -59,26 +40,28 @@ void freePanel() {
     head=NULL;
     current=NULL;
 }
+
 void panel(WINDOW *w){
-    int cmd;
+    /*
+    int cmd=0;
     taskswindow(w);
     do{
         PanelElement* temp = head;
         int x_pos=1;
-        wmove(w, 0, 1);
         wattron(w, A_BOLD);
-
-        while (temp != NULL) {
+        do{
             if (temp == current) {
-                wattroff(w, A_REVERSE);
+                wattron(w,A_BLINK);
                 mvwprintw(w,0,x_pos, " %s ", temp->name);
+                wattroff(w,A_BLINK);
+            } else{
                 wattron(w, A_REVERSE);
-            } else
                 mvwprintw(w,0,x_pos, " %s ", temp->name);
-
+                wattroff(w, A_REVERSE);
+            }
             x_pos +=strlen(temp->name)+3;
             temp = temp->next;
-        }
+        }while(temp != NULL);
         wattroff(w, A_BOLD);
         wmove(w,2,2);
         wrefresh(w);
@@ -89,7 +72,10 @@ void panel(WINDOW *w){
         else if(cmd== KEY_LEFT)
             current=(current->prev)?current->prev:current;
     }while(cmd!= KEY_DOWN);
-    wattroff(w, A_REVERSE);
-    mvwprintw(w,0,1, " View ");
+    if (!strcmp(current->name" Search "))
+        searchWindow();
+    */
     wattron(w, A_REVERSE);
+    mvwprintw(w,0,1, " View ");
+    wattroff(w, A_REVERSE);
 }
