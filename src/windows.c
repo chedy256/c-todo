@@ -1,3 +1,4 @@
+
 #include <ncurses.h>
 #include <string.h>
 #include "../include/windows.h"
@@ -7,7 +8,7 @@
 void setPriorityWindow(WINDOW *parent_win,char *action){
     int height = getmaxx(parent_win)>30?7:10;
     int width = getmaxx(parent_win)-8;
-    WINDOW *w = newwin(height, width, 10, 8);
+    WINDOW * w= newwin(height, width, 10, 8);
     box(w, 0, 0);
     wattron(w,A_BOLD);
     mvwprintw(w,1,width/2-9,"%s THE PRIORITY",action);
@@ -346,26 +347,36 @@ void taskswindow(WINDOW *parent_win){//will add what todolist to write
         mvwvline(parent_win,1,COLS-18,0,getmaxy(parent_win)-2);
         mvwprintw(parent_win,1,COLS-14, "Created on");
         wattroff(parent_win,A_BOLD);
-        /*generic*/
+        /*
+         * generic *
         wattron(parent_win,COLOR_PAIR(2)|A_UNDERLINE);
-         wattron(parent_win,A_REVERSE);
-        mvwprintw(parent_win,3,2, "[L] 1. First Task");
+        wattron(parent_win,A_REVERSE);
+        mvwprintw(parent_win,3,2, "1. First Task");
+        wattroff(parent_win,A_REVERSE);
+        wattron(parent_win,COLOR_PAIR(5));
         mvwprintw(parent_win,3,COLS-19, "V");
+        wattroff(parent_win,COLOR_PAIR(5));
         mvwprintw(parent_win,3,COLS-17, "13.04.2001 10:56");
         wattroff(parent_win,COLOR_PAIR(2)|A_UNDERLINE);
-        mvwprintw(parent_win,4,2, "[D] 1.1 First subTask");
+        mvwprintw(parent_win,4,2, "1.1 First subTask");
+        wattron(parent_win,COLOR_PAIR(2));
         mvwprintw(parent_win,4,COLS-19, "X");
+        wattroff(parent_win, COLOR_PAIR(2));
         mvwprintw(parent_win,4,COLS-17, "13.04.2001 10:58");
         wattron(parent_win,COLOR_PAIR(3));
-        mvwprintw(parent_win,5,2, "[H] 1.1.1 First subSubTask");
+        mvwprintw(parent_win,5,2, "1.1.1 First subSubTask");
+        wattron(parent_win,COLOR_PAIR(5));
         mvwprintw(parent_win,5,COLS-19, "V");
+        wattroff(parent_win,COLOR_PAIR(5));
         mvwprintw(parent_win,5,COLS-17, "13.04.2001 10:58");
-
-        mvwprintw(parent_win,6,2, "[L] 1.1.2 Second subSubTask");
+        mvwprintw(parent_win,6,2, "1.1.2 Second subSubTask");
+        wattron(parent_win,COLOR_PAIR(5));
         mvwprintw(parent_win,6,COLS-19, "V");
+        wattroff(parent_win,COLOR_PAIR(5));
         mvwprintw(parent_win,6,COLS-17, "13.04.2001 10:58");
         wattroff(parent_win,A_REVERSE);
         wattroff(parent_win,COLOR_PAIR(3));
+        */
     }// "13.04.2001 10:56" :16 char +2 spacing
     mvwhline(parent_win,2,1,0,getmaxx(parent_win)-2);
     wrefresh(parent_win);

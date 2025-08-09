@@ -13,6 +13,7 @@ int main() {
     init_pair(2, COLOR_RED, COLOR_BLACK);
     init_pair(3, COLOR_YELLOW, COLOR_BLACK);
     init_pair(4, COLOR_WHITE, COLOR_BLACK);
+    init_pair(5, COLOR_GREEN, COLOR_BLACK);
     attron(COLOR_PAIR(1));
     attron(A_BOLD);
     mvprintw(1, (getmaxx(stdscr)-36)/2, " /*** Welcome To My Todo App ***/ ");

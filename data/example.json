@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Complete project",
+      "description": "Finish the todo app",
+      "priority": 8,
+      "completed": false,
+      "created": "2024-01-15T10:30:00Z",
+      "modified": "2024-01-15T10:30:00Z",
+      "subtasks": [
+        {
+          "id": 101,
+          "title": "Design UI",
+          "completed": true,
+          "created": "2024-01-15T10:31:00Z"
+        }
+      ]
+    }
+  ]
+}
